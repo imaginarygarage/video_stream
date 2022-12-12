@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import socket
 
 import packetize
@@ -25,17 +24,7 @@ image_id = 0
 while True:
     read_success, image = camera.read()
     if read_success:
-        # image = np.zeros((11,11,3), dtype=np.uint8)
-        # image[5,5,:] = 255
-        width = image.shape[1]
-        height = image.shape[0]
-        fragment_height = min(DEFAULT_MAX_PACKET_SIZE // (3 * width), height)
-        fragments = height // fragment_height
-        fragments += 1 if fragments * fragment_height < height else 0
-        for i in range(fragments):
-            row_start = i * fragment_height
-            row_end = min(row_start + fragment_height, height)
-            image_fragment = image[row_start:row_end, :, :]
-            packet = packetize.encode_packet(image_fragment, image_id, image.shape, row_start, row_end, i, fragments)
-            stream_socket.sendto(packet, multicast_group)
+        encoded_image = packetize.EncodeImage(image, image_id)
         image_id += 1
+        for fragment in encoded_image.fragments:
+            stream_socket.sendto(fragment, multicast_group)
