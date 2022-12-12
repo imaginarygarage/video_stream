@@ -51,7 +51,7 @@ class ImageDecoder:
             self.image_fragments = {}
             self.image = None
         fragment_index = fragment_data['fragment_index']
-        self.image_fragments[fragment_index] = fragment_data.copy()
+        self.image_fragments[fragment_index] = fragment_data
         if len(self.image_fragments) == self.fragment_count:
             self.image = np.zeros(self.image_shape, np.uint8)
             for fragment_index in self.image_fragments:
